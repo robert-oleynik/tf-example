@@ -10,3 +10,4 @@ members = [
 
 [dependencies]
 docker = { version = "0.1.0", path = "crates/docker" }
+tf-bindgen = { git = "https://github.com/robert-oleynik/tf-bindgen.git", version = "0.1.0" }
