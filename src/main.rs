@@ -1,11 +1,13 @@
 use std::collections::HashSet;
+use std::process::Stdio;
 
 use docker::resource::docker_container::*;
 use docker::resource::docker_image::*;
 use docker::Docker;
+use tf_bindgen::cli::Terraform;
 use tf_bindgen::Stack;
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let stack = Stack::new("postgres");
 
     Docker::create(&stack).build();
@@ -22,4 +24,17 @@ fn main() {
         .image(&image.image_id)
         .env(["POSTGRES_PASSWORD=example"])
         .build();
+
+    Terraform::init(&stack)?
+        .spawn()
+        .expect("terraform to run")
+        .wait()
+        .unwrap();
+    Terraform::apply(&stack)?
+        .stdin(Stdio::inherit())
+        .spawn()
+        .expect("terraform to run")
+        .wait()
+        .unwrap();
+    Ok(())
 }
