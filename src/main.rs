@@ -3,12 +3,10 @@ use std::collections::HashSet;
 use docker::resource::docker_container::*;
 use docker::resource::docker_image::*;
 use docker::Docker;
-use tf_bindgen::app::App;
-use tf_bindgen::stack::Stack;
+use tf_bindgen::Stack;
 
 fn main() {
-    let app = App::default();
-    let stack = Stack::new(&app, "postgres");
+    let stack = Stack::new("postgres");
 
     Docker::create(&stack).build();
 
@@ -22,8 +20,6 @@ fn main() {
     DockerContainer::create(&stack, "postgres-container")
         .name("postgres")
         .image(&image.image_id)
-        .env(env)
+        .env(["POSTGRES_PASSWORD=example"])
         .build();
-
-    app.validate().unwrap();
 }
